@@ -11,7 +11,6 @@ kantanProject in ThisBuild := "text"
 lazy val root = Project(id = "kantan-text", base = file("."))
   .settings(moduleName := "root")
   .enablePlugins(UnpublishedPlugin)
-  .settings(doctestWithDependencies := false)
   .settings(
     initialCommands in console :=
     """
@@ -23,12 +22,10 @@ lazy val root = Project(id = "kantan-text", base = file("."))
 
 lazy val tests = project
   .enablePlugins(UnpublishedPlugin)
-  .settings(doctestWithDependencies := false)
   .settings(libraryDependencies += "org.scalatest" %% "scalatest" % scalatestVersion % "test")
   .dependsOn(core)
 
 lazy val docs = project
-  .settings(doctestWithDependencies := false)
   .enablePlugins(DocumentationPlugin)
 
 
@@ -39,8 +36,6 @@ lazy val core = project
     moduleName := "kantan.text",
     name       := "core"
   )
-  .settings(doctestTestFramework := DoctestTestFramework.ScalaTest)
-  .settings(doctestWithDependencies := false)
   .settings(libraryDependencies ++= Seq(
     "org.scalatest"      %% "scalatest"     % scalatestVersion  % "test",
     "org.scalacheck"     %% "scalacheck"    % scalacheckVersion % "test"

@@ -7,6 +7,6 @@ coverage:
         branches:
         - master
         threshold: 0
-        url: https://webhooks.gitter.im/e/c88429a5ebc57dd5d52c
+        url: https://webhooks.gitter.im/e/f18fd5772bea646db070
   status:
     patch: false

@@ -16,17 +16,4 @@
 
 package kantan.text
 
-import java.io.DataInputStream
-
-package object sanitize extends SanitizeFunctions {
-  // Unsafe, but acceptable here: we don't even want to start if the entities are not available.
-  private[sanitize] val htmlEntities: Map[String, String] = {
-    val in = new DataInputStream(this.getClass.getResourceAsStream("/kantan/text/sanitize/htmlentities.dat"))
-    try {
-      val builder = Map.newBuilder[String, String]
-      (0 until in.readInt()).foreach { _ ⇒ builder += (in.readUTF() → in.readUTF()) }
-      builder.result()
-    }
-    finally { in.close() }
-  }
-}
+package object sanitize extends SanitizeFunctions

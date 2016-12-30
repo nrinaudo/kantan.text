@@ -47,7 +47,7 @@ trait SanitizeFunctions {
         case _: Exception ⇒ str
       }
     }
-    else htmlEntities.getOrElse(entity, str)
+    else tools.htmlEntities.getOrElse(entity, str)
   }
 
   /** Strip out "ANSI" terminal escape sequences, such as those that produce colored text on Unix.
@@ -59,9 +59,10 @@ trait SanitizeFunctions {
     */
   val removeTerminalEscapes: String ⇒ String = removeAll("""(?smiuU)\u001B\[((?:\d|;)*)([a-zA-Z])""")
 
-  /*
-  val fixEncoding: String ⇒ String = ???
-  */
+  val fixEncoding: String ⇒ String = {
+    tools.encodingPatterns.head
+    identity
+  }
 
   /** Replace single-character ligatures of Latin letters, such as `ﬁ`, with the characters that they contain, as in
     * `fi`. Latin ligatures are usually not intended in text strings (though they're lovely in *rendered* text). If you

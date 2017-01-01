@@ -1,6 +1,7 @@
 from ftfy.chardata import ENCODING_REGEXES
 import codecs
 
+# Saves all known encoding regexes in an easy to compare format.
 ROOT = "../resources/kantan/text/sanitize/"
 
 with codecs.open(ROOT + 'encoding_regexes.txt', 'w', 'utf-8') as f:

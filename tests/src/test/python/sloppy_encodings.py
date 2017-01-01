@@ -1,6 +1,8 @@
 import ftfy.bad_codecs
 import codecs
 
+# Saves the expected encoding and decoding result for the first 256 bytes, by sloppy encoding.
+
 ROOT = "../resources/kantan/text/sanitize/"
 
 def write_encoded(name):

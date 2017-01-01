@@ -17,35 +17,42 @@
 package kantan.text.sanitize
 
 import java.io.DataInputStream
+import java.nio.charset.Charset
 import java.util.regex.Pattern
 
-private[sanitize] object tools {
-  private[sanitize] val supportedEncodings: List[String] = List(
-      "iso-8859-1",
-      "sloppy-windows-1252",
-      "macroman",
-      "cp437",
-      "sloppy-windows-1251"
-    )
+object tools {
+  val supportedEncodings: Map[String, Charset] = Map(
+    "iso-8859-1"          → Charset.forName("iso-8859-1"),
+    "sloppy-windows-1252" → SloppyCharset.knownValues("sloppy-windows-1252"),
+    "macroman"            → Charset.forName("MacRoman"),
+    "cp437"               → Charset.forName("cp437"),
+    "sloppy-windows-1251" → SloppyCharset.knownValues("sloppy-windows-1251")
+  )
 
-    private[sanitize] val encodingPatterns: Map[String, Pattern] = {
-      val builder = Map.newBuilder[String, Pattern]
+  val encodingPatterns: Map[String, Pattern] = {
+    val builder     = Map.newBuilder[String, Pattern]
+    val latin1Table = ((128 until 256).map(_.toChar).mkString + '\u001a').getBytes("iso-8859-1")
 
-      val latin1Table = (128 until 256).map(_.toChar).mkString + '\u001a'
+    builder += "ascii" → Pattern.compile("^[\u0000-\u007f]*$")
 
-      builder += "ascii" → Pattern.compile("""^[\x00-\x7f]*$""")
+    supportedEncodings.foreach { case (name, encoding) ⇒
+      builder += name → Pattern.compile(s"^[\u0000-\u0019\u001b-\u007f${new String(latin1Table, encoding)}]*$$")
+    }
 
+    builder.result()
+  }
+
+  def possibleEncoding(text: String, encoding: String): Boolean =
+    encodingPatterns.get(encoding).exists(_.matcher(text).matches())
+
+  // Unsafe, but acceptable here: we don't even want to start if the entities are not available.
+  val htmlEntities: Map[String, String] = {
+    val in = new DataInputStream(this.getClass.getResourceAsStream("/kantan/text/sanitize/htmlentities.dat"))
+    try {
+      val builder = Map.newBuilder[String, String]
+      (0 until in.readInt()).foreach { _ ⇒ builder += (in.readUTF() → in.readUTF()) }
       builder.result()
     }
-
-    // Unsafe, but acceptable here: we don't even want to start if the entities are not available.
-    private[sanitize] val htmlEntities: Map[String, String] = {
-      val in = new DataInputStream(this.getClass.getResourceAsStream("/kantan/text/sanitize/htmlentities.dat"))
-      try {
-        val builder = Map.newBuilder[String, String]
-        (0 until in.readInt()).foreach { _ ⇒ builder += (in.readUTF() → in.readUTF()) }
-        builder.result()
-      }
-      finally { in.close() }
-    }
+    finally { in.close() }
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Nicolas Rinaudo
+ * Copyright 2017 Nicolas Rinaudo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ class SloppyCharsetTests extends FunSuite {
       case i  ⇒ go(in, buf, out.append(new String(buf, 0, i)))
     }
 
-    go(new InputStreamReader(getClass.getResourceAsStream(s"/kantan/text/sanitize/$res"), charset),
+    go(new InputStreamReader(io.resource(res), charset),
       new Array[Char](256), new StringBuilder)
   }
 

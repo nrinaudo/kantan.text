@@ -19,13 +19,27 @@ package kantan.text.sanitize
 import org.scalatest.FunSuite
 import scala.io.{Codec, Source}
 
-class EncodingPatternsTests extends FunSuite {
-  Source.fromInputStream(io.resource("encoding_regexes.txt"))(Codec.UTF8)
-    .getLines()
-    .map(_.span(_ != ' '))
-    .foreach { case (name, regex) ⇒
-      test(s"Regex for $name should have the expected value") {
-        assert(tools.encodingPatterns(name).pattern() == regex.trim)
-      }
+class PartialUtf8PunctuationTests extends FunSuite {
+  implicit val codec: Codec = Codec.UTF8
+
+  test(s"Regex should have the expected value") {
+    assert(
+      tools.partialUtf8PunctuationPattern.pattern()
+      ==
+      Source.fromInputStream(io.resource(s"partial_utf8_punctuation.txt")).mkString.trim
+    )
+  }
+
+  List(
+    ("â€“", "–"),
+    ("â€”", "—"),
+    ("â€˜", "‘"),
+    ("â€™", "’"),
+    ("â€œ", "“"),
+    ("â€", "”")
+  ).foreach { case (broken, fixed) ⇒
+    test(s"$broken should be replaced with $fixed") {
+      assert(tools.fixPartialUtf8Punctuation(broken) == fixed)
     }
+  }
 }

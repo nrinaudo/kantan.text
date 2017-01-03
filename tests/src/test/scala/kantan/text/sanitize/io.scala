@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package kantan
+package kantan.text.sanitize
 
-package object text extends CoreFunctions with
-                            sanitize.SanitizeFunctions with
-                            preprocess.PreprocessFunctions
+import java.io.InputStream
+
+object io {
+  def resource(name: String): InputStream = getClass.getResourceAsStream(s"/kantan/text/sanitize/$name")
+}

@@ -22,11 +22,18 @@ import java.util.regex.Pattern
 import kantan.text._
 
 object tools {
+  // - Commonly used encodings -----------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------------------------
   val Utf8: Charset = Charset.forName("UTF-8")
   val Cp1252: Charset = Charset.forName("windows-1252")
   val SloppyCp1252: Charset = SloppyCharset.knownValues("sloppy-windows-1252")
   val Latin1: Charset = Charset.forName("iso-8859-1")
 
+  /** List of encodings supported by `kantan.text.sanitize`.
+    *
+    * These are by far the most commonly mangled encodings. We could support more, but the rate of false positives
+    * would rise to unacceptable levels.
+    */
   val supportedEncodings: List[(String, Charset)] = List(
     "iso-8859-1"          → Charset.forName("iso-8859-1"),
     "sloppy-windows-1252" → SloppyCharset.knownValues("sloppy-windows-1252"),
@@ -35,6 +42,7 @@ object tools {
     "sloppy-windows-1251" → SloppyCharset.knownValues("sloppy-windows-1251")
   )
 
+  /** Patterns used to detect mangled encodings. */
   val encodingPatterns: Map[String, Pattern] = {
     val builder     = Map.newBuilder[String, Pattern]
     val latin1Table = ((128 until 256).map(_.toChar).mkString + '\u001a').getBytes(Latin1)
@@ -64,6 +72,8 @@ object tools {
       encodings match {
         case h :: t ⇒
           if(possibleEncoding(text, h._1)) {
+            // Now, find out if it's UTF-8 (or close enough). Otherwise,
+            // remember the encoding for later.
             try {
               val bytes = text.getBytes(h._2)
 
@@ -96,7 +106,37 @@ object tools {
         val fixed = fixPartialUtf8Punctuation(text)
         if(fixed != text) fixed
 
-        // TODO: check if latin-1 meant as windows-1252
+        // The next most likely case is that this is Latin-1 that was intended to
+        // be read as Windows-1252, because those two encodings in particular are
+        // easily confused.
+
+        else if(possible1Byte.contains("iso-8859-1")) {
+          // This text is in the intersection of Latin-1 and
+          // Windows-1252, so it's probably legit.
+          if(possible1Byte.contains("windows-1252")) text
+          else {
+
+            // Otherwise, it means we have characters that are in Latin-1 but
+            // not in Windows-1252. Those are C1 control characters. Nobody
+            // wants those. Assume they were meant to be Windows-1252. Don't
+            // use the sloppy codec, because bad Windows-1252 characters are
+            // a bad sign.
+            val fixed = try { new String(text.getBytes(Latin1), Cp1252) }
+            catch { case _: Exception ⇒ text }
+
+            if(fixed != text) fixed
+            else              text
+          }
+        }
+
+        // The cases that remain are mixups between two different single-byte
+        // encodings, and not the common case of Latin-1 vs. Windows-1252.
+        //
+        // These cases may be unsolvable without adding false positives, though
+        // I have vague ideas about how to optionally address them in the future.
+        //
+        // Return the text unchanged; the plan is empty.
+
         else text
 
       case Right(fixed) ⇒ fixed

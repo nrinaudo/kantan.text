@@ -36,8 +36,5 @@ lazy val core = project
     moduleName := "kantan.text",
     name       := "core"
   )
-  .settings(libraryDependencies ++= Seq(
-    "org.scalatest"      %% "scalatest"     % scalatestVersion  % "test",
-    "org.scalacheck"     %% "scalacheck"    % scalacheckVersion % "test"
-  ))
+  .settings(libraryDependencies += "org.scalatest"      %% "scalatest"     % scalatestVersion  % "test")
   .enablePlugins(PublishedPlugin)

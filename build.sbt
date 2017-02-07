@@ -1,8 +1,3 @@
-// - Dependency versions -----------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
-val scalacheckVersion  = "1.13.4"
-val scalatestVersion   = "3.0.1"
-
 kantanProject in ThisBuild := "text"
 
 
@@ -22,7 +17,7 @@ lazy val root = Project(id = "kantan-text", base = file("."))
 
 lazy val tests = project
   .enablePlugins(UnpublishedPlugin)
-  .settings(libraryDependencies += "org.scalatest" %% "scalatest" % scalatestVersion % "test")
+  .settings(libraryDependencies += "org.scalatest" %% "scalatest" % Versions.scalatest % "test")
   .dependsOn(core)
 
 lazy val docs = project
@@ -36,5 +31,5 @@ lazy val core = project
     moduleName := "kantan.text",
     name       := "core"
   )
-  .settings(libraryDependencies += "org.scalatest"      %% "scalatest"     % scalatestVersion  % "test")
+  .settings(libraryDependencies += "org.scalatest"      %% "scalatest"     % Versions.scalatest  % "test")
   .enablePlugins(PublishedPlugin)

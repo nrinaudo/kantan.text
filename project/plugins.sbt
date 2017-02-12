@@ -1,1 +1,1 @@
-addSbtPlugin("com.nrinaudo" % "kantan.sbt" % "1.2.6")
+addSbtPlugin("com.nrinaudo" % "kantan.sbt" % "1.3.0")

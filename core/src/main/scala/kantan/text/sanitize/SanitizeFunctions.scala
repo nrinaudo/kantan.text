@@ -59,11 +59,6 @@ trait SanitizeFunctions {
     */
   val removeTerminalEscapes: String ⇒ String = removeAll("""(?smiuU)\u001B\[((?:\d|;)*)([a-zA-Z])""")
 
-  val fixEncoding: String ⇒ String = {
-    tools.encodingPatterns.head
-    identity
-  }
-
   /** Replace single-character ligatures of Latin letters, such as `ﬁ`, with the characters that they contain, as in
     * `fi`. Latin ligatures are usually not intended in text strings (though they're lovely in *rendered* text). If you
     * have such a ligature in your string, it is probably a result of a copy-and-paste glitch.
@@ -157,10 +152,10 @@ trait SanitizeFunctions {
     * scala> val high = 0xd83d.toChar
     * scala> val low = 0xdca9.toChar
     *
-    * scala> fixSurrogates(high.toString + low)
+    * scala> fixSurrogates(high.toString + low.toString)
     * res1: String = \uD83D\uDCA9
     *
-    * scala> fixSurrogates(low.toString + high)
+    * scala> fixSurrogates(low.toString + high.toString)
     * res2: String = ��
     * }}}
     */

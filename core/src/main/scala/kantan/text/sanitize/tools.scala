@@ -45,7 +45,7 @@ object tools {
   /** Patterns used to detect mangled encodings. */
   val encodingPatterns: Map[String, Pattern] = {
     val builder     = Map.newBuilder[String, Pattern]
-    val latin1Table = ((128 until 256).map(_.toChar).mkString + '\u001a').getBytes(Latin1)
+    val latin1Table = ((128 until 256).map(_.toChar).mkString + '\u001a'.toString).getBytes(Latin1)
 
     builder += "ascii" → Pattern.compile("^[\u0000-\u007f]*$")
 

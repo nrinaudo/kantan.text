@@ -21,6 +21,7 @@ import scala.collection.JavaConverters._
 import sun.nio.cs.SingleByte
 import sun.nio.cs.SingleByte.{Decoder, Encoder}
 
+@SuppressWarnings(Array("org.wartremover.warts.Null"))
 class SloppyCharset(charset: Charset) extends Charset(s"sloppy-${charset.name()}",
   charset.aliases().asScala.map(s ⇒ s"sloppy-$s").toArray) {
 

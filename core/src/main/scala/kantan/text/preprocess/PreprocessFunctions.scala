@@ -53,52 +53,55 @@ trait PreprocessFunctions {
   def replaceUrls(by: String): String ⇒ String = {
     val shortUrl = Pattern.compile(
       """(?smi)""" +
-      """(?:^|(?<![\w/.]))""" +
-      // optional scheme
-      """(?:(?:https?://)?)""" +
-      // domain
-      """(?:\w-?)*?\w+(?:\.[a-z]{2,12}){1,3}""" +
-      """/""" +
-      // hash
-      """[^\s.,?!'\"|+]{2,12}""" +
-      """(?:$|(?![\w?!+&/]))""")
+        """(?:^|(?<![\w/.]))""" +
+        // optional scheme
+        """(?:(?:https?://)?)""" +
+        // domain
+        """(?:\w-?)*?\w+(?:\.[a-z]{2,12}){1,3}""" +
+        """/""" +
+        // hash
+        """[^\s.,?!'\"|+]{2,12}""" +
+        """(?:$|(?![\w?!+&/]))"""
+    )
 
     val url = Pattern.compile(
       """(?smiuU)""" +
-      """(?:^|(?<![\w/.]))""" +
-      // protocol identifier
-      """(?:(?:https?://|ftp://|www\d{0,3}\.))""" +
-      // user:pass authentication
-      """(?:\S+(?::\S*)?@)?""" +
-      """(?:""" +
-      // IP address exclusion
-      // private & local networks
-      """(?!(?:10|127)(?:\.\d{1,3}){3})""" +
-      """(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})""" +
-      """(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})""" +
-      // IP address dotted notation octets
-      // excludes loopback network 0.0.0.0
-      // excludes reserved space >= 224.0.0.0
-      // excludes network & broadcast addresses
-      // (first & last IP address of each class)
-      """(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])""" +
-      """(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}""" +
-      """(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))""" +
-      """|""" +
-      // host name
-      """(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)""" +
-      // domain name
-      """(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*""" +
-      // TLD identifier
-      """(?:\.(?:[a-z\u00a1-\uffff]{2,}))""" +
-      """)""" +
-      // port number
-      """(?::\d{2,5})?""" +
-      // resource path
-      """(?:/\S*)?""" +
-      """(?:$|(?![\w?!+&/]))""")
+        """(?:^|(?<![\w/.]))""" +
+        // protocol identifier
+        """(?:(?:https?://|ftp://|www\d{0,3}\.))""" +
+        // user:pass authentication
+        """(?:\S+(?::\S*)?@)?""" +
+        """(?:""" +
+        // IP address exclusion
+        // private & local networks
+        """(?!(?:10|127)(?:\.\d{1,3}){3})""" +
+        """(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})""" +
+        """(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})""" +
+        // IP address dotted notation octets
+        // excludes loopback network 0.0.0.0
+        // excludes reserved space >= 224.0.0.0
+        // excludes network & broadcast addresses
+        // (first & last IP address of each class)
+        """(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])""" +
+        """(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}""" +
+        """(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))""" +
+        """|""" +
+        // host name
+        """(?:(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)""" +
+        // domain name
+        """(?:\.(?:[a-z\u00a1-\uffff0-9]-?)*[a-z\u00a1-\uffff0-9]+)*""" +
+        // TLD identifier
+        """(?:\.(?:[a-z\u00a1-\uffff]{2,}))""" +
+        """)""" +
+        // port number
+        """(?::\d{2,5})?""" +
+        // resource path
+        """(?:/\S*)?""" +
+        """(?:$|(?![\w?!+&/]))"""
+    )
 
-    str ⇒ url.matcher(shortUrl.matcher(str).replaceAll(by)).replaceAll(by)
+    str ⇒
+      url.matcher(shortUrl.matcher(str).replaceAll(by)).replaceAll(by)
   }
 
   /** Replaces all emails in a string with `by`.
@@ -108,9 +111,12 @@ trait PreprocessFunctions {
     * res1: String = I can be reached at *EMAIL* through next Friday.
     * }}}
     */
-  def replaceEmails(by: String): String ⇒ String = replaceAll(
-    """(?smiuU)(?:^|(?<=[^\w@.)]))""" +
-    """([\w+-](\.(?!\.))?)*?[\w+-]@(?:\w-?)*?\w+(\.([a-z]{2,})){1,3}(?:$|(?=\b))""", by)
+  def replaceEmails(by: String): String ⇒ String =
+    replaceAll(
+      """(?smiuU)(?:^|(?<=[^\w@.)]))""" +
+        """([\w+-](\.(?!\.))?)*?[\w+-]@(?:\w-?)*?\w+(\.([a-z]{2,})){1,3}(?:$|(?=\b))""",
+      by
+    )
 
   /** Replaces all phone numbers in a string with `by`.
     *
@@ -119,11 +125,13 @@ trait PreprocessFunctions {
     * res1: String = I can be reached at *PHONE* through next Friday.
     * }}}
     */
-  def replacePhoneNumbers(by: String): String ⇒ String = replaceAll(
-    """(?smiuU)(?:^|(?<=[^\w)]))""" +
-    """(\+?1[ .-]?)?(\(?\d{3}\)?[ .-]?)?\d{3}[ .-]?\d{4}""" +
-    """(\s?(?:ext\.?|[#x-])\s?\d{2,6})?(?:$|(?=\W))""",
-    by)
+  def replacePhoneNumbers(by: String): String ⇒ String =
+    replaceAll(
+      """(?smiuU)(?:^|(?<=[^\w)]))""" +
+        """(\+?1[ .-]?)?(\(?\d{3}\)?[ .-]?)?\d{3}[ .-]?\d{4}""" +
+        """(\s?(?:ext\.?|[#x-])\s?\d{2,6})?(?:$|(?=\W))""",
+      by
+    )
 
   /** Replaces all numbers in a string with `by`.
     *
@@ -134,8 +142,8 @@ trait PreprocessFunctions {
     */
   def replaceNumbers(by: String): String ⇒ String = replaceAll(
     """(?smiuU)(?:^|(?<=[^\w,.]))""" +
-    """[+–-]?(([1-9]\d{0,2}(,\d{3})+(\.\d*)?)|([1-9]\d{0,2}""" +
-    """([ .]\d{3})+(,\d*)?)|(\d*?[.,]\d+)|\d+)(?:$|(?=\b))""",
+      """[+–-]?(([1-9]\d{0,2}(,\d{3})+(\.\d*)?)|([1-9]\d{0,2}""" +
+      """([ .]\d{3})+(,\d*)?)|(\d*?[.,]\d+)|\d+)(?:$|(?=\b))""",
     by
   )
 
@@ -167,6 +175,7 @@ trait PreprocessFunctions {
     */
   val removeDiacritics: String ⇒ String = normalize(Normalizer.Form.NFD) andThen removeAll(
     """(?smiuU)(\p{InCombiningDiacriticalMarks}|""" +
-    """\p{InCombiningDiacriticalMarksForSymbols}|""" +
-    """\p{InVariationSelectors})++""")
+      """\p{InCombiningDiacriticalMarksForSymbols}|""" +
+      """\p{InVariationSelectors})++"""
+  )
 }

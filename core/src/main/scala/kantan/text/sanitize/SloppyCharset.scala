@@ -22,8 +22,8 @@ import sun.nio.cs.SingleByte
 import sun.nio.cs.SingleByte.{Decoder, Encoder}
 
 @SuppressWarnings(Array("org.wartremover.warts.Null"))
-class SloppyCharset(charset: Charset) extends Charset(s"sloppy-${charset.name()}",
-  charset.aliases().asScala.map(s ⇒ s"sloppy-$s").toArray) {
+class SloppyCharset(charset: Charset)
+    extends Charset(s"sloppy-${charset.name()}", charset.aliases().asScala.map(s ⇒ s"sloppy-$s").toArray) {
 
   private val b2c = {
     // All bytes as they'd be encoded in ISO-LATIN-1.
@@ -31,8 +31,9 @@ class SloppyCharset(charset: Charset) extends Charset(s"sloppy-${charset.name()}
 
     // All bytes encoded using the specified charset. Any character that is undefined (\uFFFD) is replaced by its
     // ISO-LATIN-1 value.
-    new String((-128 until 128).map(_.toByte).toArray, charset).zipWithIndex.filter(_._1 != '\uFFFD')
-      .foreach { case (c, i) ⇒ sloppyChars(i) = c }
+    new String((-128 until 128).map(_.toByte).toArray, charset).zipWithIndex.filter(_._1 != '\uFFFD').foreach {
+      case (c, i) ⇒ sloppyChars(i) = c
+    }
 
     // For ftfy's own purposes, we're going to allow byte 1A, the "Substitute"
     // control code, to encode the Unicode replacement character U+FFFD.
@@ -41,7 +42,7 @@ class SloppyCharset(charset: Charset) extends Charset(s"sloppy-${charset.name()}
     sloppyChars
   }
 
-  private val c2b = new Array[Char](1536)
+  private val c2b      = new Array[Char](1536)
   private val c2bIndex = new Array[Char](256)
   SingleByte.initC2B(b2c, null: Array[Char], c2b, c2bIndex)
 
@@ -52,11 +53,10 @@ class SloppyCharset(charset: Charset) extends Charset(s"sloppy-${charset.name()}
   override def contains(cs: Charset): Boolean = false
 }
 
-
 object SloppyCharset {
   val knownValues: Map[String, Charset] =
     ((1250 until 1259).map(i ⇒ s"windows-$i") ++
-    List(3, 6, 7, 8, 11).map(i ⇒ s"iso-8859-$i")).foldLeft(Map.empty[String, Charset]) { (acc, name) ⇒
+      List(3, 6, 7, 8, 11).map(i ⇒ s"iso-8859-$i")).foldLeft(Map.empty[String, Charset]) { (acc, name) ⇒
       acc + (s"sloppy-$name" → new SloppyCharset(Charset.forName(name)))
     }
 }

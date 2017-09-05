@@ -17,4 +17,3 @@
 package kantan.text
 
 package object preprocess extends PreprocessFunctions
-

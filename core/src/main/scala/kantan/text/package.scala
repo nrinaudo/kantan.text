@@ -16,6 +16,4 @@
 
 package kantan
 
-package object text extends CoreFunctions with
-                            sanitize.SanitizeFunctions with
-                            preprocess.PreprocessFunctions
+package object text extends CoreFunctions with sanitize.SanitizeFunctions with preprocess.PreprocessFunctions

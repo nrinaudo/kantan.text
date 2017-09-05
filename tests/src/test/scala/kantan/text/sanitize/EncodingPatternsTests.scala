@@ -20,12 +20,14 @@ import org.scalatest.FunSuite
 import scala.io.{Codec, Source}
 
 class EncodingPatternsTests extends FunSuite {
-  Source.fromInputStream(io.resource("encoding_regexes.txt"))(Codec.UTF8)
+  Source
+    .fromInputStream(io.resource("encoding_regexes.txt"))(Codec.UTF8)
     .getLines()
     .map(_.span(_ != ' '))
-    .foreach { case (name, regex) ⇒
-      test(s"Regex for $name should have the expected value") {
-        assert(tools.encodingPatterns(name).pattern() == regex.trim)
-      }
+    .foreach {
+      case (name, regex) ⇒
+        test(s"Regex for $name should have the expected value") {
+          assert(tools.encodingPatterns(name).pattern() == regex.trim)
+        }
     }
 }

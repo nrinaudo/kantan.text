@@ -24,10 +24,10 @@ import kantan.text._
 object tools {
   // - Commonly used encodings -----------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
-  val Utf8: Charset = Charset.forName("UTF-8")
-  val Cp1252: Charset = Charset.forName("windows-1252")
+  val Utf8: Charset         = Charset.forName("UTF-8")
+  val Cp1252: Charset       = Charset.forName("windows-1252")
   val SloppyCp1252: Charset = SloppyCharset.knownValues("sloppy-windows-1252")
-  val Latin1: Charset = Charset.forName("iso-8859-1")
+  val Latin1: Charset       = Charset.forName("iso-8859-1")
 
   /** List of encodings supported by `kantan.text.sanitize`.
     *
@@ -49,8 +49,9 @@ object tools {
 
     builder += "ascii" → Pattern.compile("^[\u0000-\u007f]*$")
 
-    supportedEncodings.foreach { case (name, encoding) ⇒
-      builder += name → Pattern.compile(s"^[\u0000-\u0019\u001b-\u007f${new String(latin1Table, encoding)}]*$$")
+    supportedEncodings.foreach {
+      case (name, encoding) ⇒
+        builder += name → Pattern.compile(s"^[\u0000-\u0019\u001b-\u007f${new String(latin1Table, encoding)}]*$$")
     }
 
     builder.result()
@@ -82,8 +83,7 @@ object tools {
               // TODO: check for utf-8 variant
 
               Right(new String(bytes, Utf8))
-            }
-            catch {
+            } catch {
               case _: Exception ⇒ findEncodingFromPattern(t, acc + h._1)
             }
 
@@ -99,48 +99,45 @@ object tools {
     // Suppose the text was supposed to be UTF-8, but it was decoded using
     // a single-byte encoding instead. When these cases can be fixed, they
     // are usually the correct thing to do, so try them next.
-    else findEncodingFromPattern(supportedEncodings, Set.empty) match {
-      case Left(possible1Byte) ⇒
+    else
+      findEncodingFromPattern(supportedEncodings, Set.empty) match {
+        case Left(possible1Byte) ⇒
+          // Look for a-hat-euro sequences that remain, and fix them in isolation.
+          val fixed = fixPartialUtf8Punctuation(text)
+          if(fixed != text) fixed
 
-        // Look for a-hat-euro sequences that remain, and fix them in isolation.
-        val fixed = fixPartialUtf8Punctuation(text)
-        if(fixed != text) fixed
+          // The next most likely case is that this is Latin-1 that was intended to
+          // be read as Windows-1252, because those two encodings in particular are
+          // easily confused.
+          else if(possible1Byte.contains("iso-8859-1")) {
+            // This text is in the intersection of Latin-1 and
+            // Windows-1252, so it's probably legit.
+            if(possible1Byte.contains("windows-1252")) text
+            else {
 
-        // The next most likely case is that this is Latin-1 that was intended to
-        // be read as Windows-1252, because those two encodings in particular are
-        // easily confused.
+              // Otherwise, it means we have characters that are in Latin-1 but
+              // not in Windows-1252. Those are C1 control characters. Nobody
+              // wants those. Assume they were meant to be Windows-1252. Don't
+              // use the sloppy codec, because bad Windows-1252 characters are
+              // a bad sign.
+              val fixed = try { new String(text.getBytes(Latin1), Cp1252) } catch { case _: Exception ⇒ text }
 
-        else if(possible1Byte.contains("iso-8859-1")) {
-          // This text is in the intersection of Latin-1 and
-          // Windows-1252, so it's probably legit.
-          if(possible1Byte.contains("windows-1252")) text
-          else {
-
-            // Otherwise, it means we have characters that are in Latin-1 but
-            // not in Windows-1252. Those are C1 control characters. Nobody
-            // wants those. Assume they were meant to be Windows-1252. Don't
-            // use the sloppy codec, because bad Windows-1252 characters are
-            // a bad sign.
-            val fixed = try { new String(text.getBytes(Latin1), Cp1252) }
-            catch { case _: Exception ⇒ text }
-
-            if(fixed != text) fixed
-            else              text
+              if(fixed != text) fixed
+              else text
+            }
           }
-        }
 
-        // The cases that remain are mixups between two different single-byte
-        // encodings, and not the common case of Latin-1 vs. Windows-1252.
-        //
-        // These cases may be unsolvable without adding false positives, though
-        // I have vague ideas about how to optionally address them in the future.
-        //
-        // Return the text unchanged; the plan is empty.
+          // The cases that remain are mixups between two different single-byte
+          // encodings, and not the common case of Latin-1 vs. Windows-1252.
+          //
+          // These cases may be unsolvable without adding false positives, though
+          // I have vague ideas about how to optionally address them in the future.
+          //
+          // Return the text unchanged; the plan is empty.
+          else text
 
-        else text
-
-      case Right(fixed) ⇒ fixed
-    }
+        case Right(fixed) ⇒ fixed
+      }
   }
 
   // Unsafe, but acceptable here: we don't even want to start if the entities are not available.
@@ -148,9 +145,10 @@ object tools {
     val in = new DataInputStream(this.getClass.getResourceAsStream("/kantan/text/sanitize/htmlentities.dat"))
     try {
       val builder = Map.newBuilder[String, String]
-      (0 until in.readInt()).foreach { _ ⇒ builder += (in.readUTF() → in.readUTF()) }
+      (0 until in.readInt()).foreach { _ ⇒
+        builder += (in.readUTF() → in.readUTF())
+      }
       builder.result()
-    }
-    finally { in.close() }
+    } finally { in.close() }
   }
 }

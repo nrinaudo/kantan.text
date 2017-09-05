@@ -22,11 +22,11 @@ import scala.io.{Codec, Source}
 class PartialUtf8PunctuationTests extends FunSuite {
   implicit val codec: Codec = Codec.UTF8
 
-  test(s"Regex should have the expected value") {
+  test("Regex should have the expected value") {
     assert(
       tools.partialUtf8PunctuationPattern.pattern()
-      ==
-      Source.fromInputStream(io.resource(s"partial_utf8_punctuation.txt")).mkString.trim
+        ==
+          Source.fromInputStream(io.resource("partial_utf8_punctuation.txt")).mkString.trim
     )
   }
 
@@ -37,9 +37,10 @@ class PartialUtf8PunctuationTests extends FunSuite {
     ("â€™", "’"),
     ("â€œ", "“"),
     ("â€", "”")
-  ).foreach { case (broken, fixed) ⇒
-    test(s"$broken should be replaced with $fixed") {
-      assert(tools.fixPartialUtf8Punctuation(broken) == fixed)
-    }
+  ).foreach {
+    case (broken, fixed) ⇒
+      test(s"$broken should be replaced with $fixed") {
+        assert(tools.fixPartialUtf8Punctuation(broken) == fixed)
+      }
   }
 }

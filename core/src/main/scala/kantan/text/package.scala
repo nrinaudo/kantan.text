@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Nicolas Rinaudo
+ * Copyright 2016 Nicolas Rinaudo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,4 @@
 
 package kantan
 
-package object text extends CoreFunctions with
-                            sanitize.SanitizeFunctions with
-                            preprocess.PreprocessFunctions
+package object text extends CoreFunctions with sanitize.SanitizeFunctions with preprocess.PreprocessFunctions

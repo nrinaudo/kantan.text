@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Nicolas Rinaudo
+ * Copyright 2016 Nicolas Rinaudo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,32 +26,32 @@ class SloppyCharsetTests extends FunSuite {
       case -1 ⇒
         in.close()
         out.result()
-      case i  ⇒ go(in, buf, out.append(new String(buf, 0, i)))
+      case i ⇒ go(in, buf, out.append(new String(buf, 0, i)))
     }
 
-    go(new InputStreamReader(io.resource(res), charset),
-      new Array[Char](256), new StringBuilder)
+    go(new InputStreamReader(io.resource(res), charset), new Array[Char](256), new StringBuilder)
   }
 
   def loadBytes(res: String): Array[Byte] = {
     val bytes = new Array[Byte](256)
-    val in = getClass.getResourceAsStream(s"/kantan/text/sanitize/$res")
+    val in    = getClass.getResourceAsStream(s"/kantan/text/sanitize/$res")
     in.read(bytes)
     in.close()
     bytes
   }
 
-  val raw = "encoded-latin-1.txt"
+  val raw       = "encoded-latin-1.txt"
   val rawString = loadString(raw, Charset.forName("iso-8859-1"))
-  val rawBytes = loadBytes(raw)
+  val rawBytes  = loadBytes(raw)
 
-  SloppyCharset.knownValues.foreach { case (name,  charset) ⇒
-    test(s"$name should encode characters as expected") {
-      assert(loadBytes(s"encoded-$name.txt").deep == rawString.getBytes(charset).deep)
-    }
+  SloppyCharset.knownValues.foreach {
+    case (name, charset) ⇒
+      test(s"$name should encode characters as expected") {
+        assert(loadBytes(s"encoded-$name.txt").deep == rawString.getBytes(charset).deep)
+      }
 
-    test(s"$name should decode bytes as expected") {
-      assert(loadString(s"decoded-$name.txt", Charset.forName("utf-8")) == new String(rawBytes, charset))
-    }
+      test(s"$name should decode bytes as expected") {
+        assert(loadString(s"decoded-$name.txt", Charset.forName("utf-8")) == new String(rawBytes, charset))
+      }
   }
 }

@@ -1,5 +1,5 @@
 kantanProject in ThisBuild := "text"
-
+startYear in ThisBuild     := Some(2016)
 
 // - root projects -----------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
@@ -8,7 +8,7 @@ lazy val root = Project(id = "kantan-text", base = file("."))
   .enablePlugins(UnpublishedPlugin)
   .settings(
     initialCommands in console :=
-    """
+      """
       |import kantan.text._
     """.stripMargin
   )
@@ -23,7 +23,6 @@ lazy val tests = project
 lazy val docs = project
   .enablePlugins(DocumentationPlugin)
 
-
 // - core projects -----------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 lazy val core = project
@@ -31,5 +30,5 @@ lazy val core = project
     moduleName := "kantan.text",
     name       := "core"
   )
-  .settings(libraryDependencies += "org.scalatest"      %% "scalatest"     % Versions.scalatest  % "test")
+  .settings(libraryDependencies += "org.scalatest" %% "scalatest" % Versions.scalatest % "test")
   .enablePlugins(PublishedPlugin)

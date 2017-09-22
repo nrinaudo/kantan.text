@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Nicolas Rinaudo
+ * Copyright 2016 Nicolas Rinaudo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,14 @@ import org.scalatest.FunSuite
 import scala.io.{Codec, Source}
 
 class EncodingPatternsTests extends FunSuite {
-  Source.fromInputStream(io.resource("encoding_regexes.txt"))(Codec.UTF8)
+  Source
+    .fromInputStream(io.resource("encoding_regexes.txt"))(Codec.UTF8)
     .getLines()
     .map(_.span(_ != ' '))
-    .foreach { case (name, regex) ⇒
-      test(s"Regex for $name should have the expected value") {
-        assert(tools.encodingPatterns(name).pattern() == regex.trim)
-      }
+    .foreach {
+      case (name, regex) ⇒
+        test(s"Regex for $name should have the expected value") {
+          assert(tools.encodingPatterns(name).pattern() == regex.trim)
+        }
     }
 }

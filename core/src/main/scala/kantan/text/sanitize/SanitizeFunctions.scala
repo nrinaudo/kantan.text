@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Nicolas Rinaudo
+ * Copyright 2016 Nicolas Rinaudo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import kantan.text._
 
 /** Collection of functions adapted from [[https://ftfy.readthedocs.io ftfy]]. */
 trait SanitizeFunctions {
+
   /** Decode all three types of HTML entities/character references.
     *
     * Code by Fredrik Lundh of effbot.org. Rob Speer made a slight change
@@ -41,9 +42,8 @@ trait SanitizeFunctions {
 
       try {
         if(code.startsWith("x")) Integer.parseInt(code.substring(1), 16).toChar.toString
-        else                     code.toInt.toChar.toString
-      }
-      catch {
+        else code.toInt.toChar.toString
+      } catch {
         case _: Exception ⇒ str
       }
     }
@@ -71,17 +71,19 @@ trait SanitizeFunctions {
     * res1: String = fluffiest
     * }}}
     */
-  val fixLatinLigatures: String ⇒ String = translate(Map(
-    'Ĳ' → "IJ",
-    'ĳ' → "ij",
-    'ﬀ' → "ff",
-    'ﬁ' → "fi",
-    'ﬂ' → "fl",
-    'ﬃ' → "ffi",
-    'ﬄ' → "ffl",
-    'ﬅ' → "ſt",
-    'ﬆ' → "st"
-  ))
+  val fixLatinLigatures: String ⇒ String = translate(
+    Map(
+      'Ĳ' → "IJ",
+      'ĳ' → "ij",
+      'ﬀ' → "ff",
+      'ﬁ' → "fi",
+      'ﬂ' → "fl",
+      'ﬃ' → "ffi",
+      'ﬄ' → "ffl",
+      'ﬅ' → "ſt",
+      'ﬆ' → "st"
+    )
+  )
 
   /** The ASCII characters, katakana, and Hangul characters have alternate "halfwidth" or "fullwidth" forms that help
     * text line up in a grid.
@@ -182,7 +184,8 @@ trait SanitizeFunctions {
     *  - `CR` (`U+000D`)
     */
   val removeControlChars: String ⇒ String = translate(
-    (0 until 32).filter(i ⇒ i != 9 && i != 10 && i != 12 && i != 13)
+    (0 until 32)
+      .filter(i ⇒ i != 9 && i != 10 && i != 12 && i != 13)
       .foldLeft(Map.empty[Char, String])((acc, c) ⇒ acc + (c.toChar → ""))
   )
 
